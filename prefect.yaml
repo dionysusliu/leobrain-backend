@@ -3,11 +3,9 @@ name: leobrain-crawlers
 pull:
 - prefect.deployments.steps.git_clone:
     id: clone-repo
-    repository: https://github.com/dionysusliu/leobrain.git
+    repository: https://github.com/dionysusliu/leobrain-backend.git
     branch: main
-    access_token: null
-- prefect.deployments.steps.set_working_directory:
-    directory: '{{ clone-repo.repository }}'
+    credentials: "{{ prefect.blocks.github-credentials.github-credential }}"
 deployments:
 - name: crawl-bbc
   version: null
@@ -17,7 +15,7 @@ deployments:
   description: Crawl deployment for bbc
   schedule:
     cron: '*/10 * * * *'
-  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  entrypoint: flows/crawler_flows.py:pf_flow_crawl_site_by_name
   parameters:
     site_name: bbc
     config:
@@ -35,9 +33,6 @@ deployments:
       use_render: false
   work_pool:
     name: pool-spider-rss
-    job_variables:
-      env:
-        PYTHONPATH: '{{ clone-repo.repository }}/backend'
 - name: crawl-theguardian
   version: null
   tags:
@@ -46,7 +41,7 @@ deployments:
   description: Crawl deployment for theguardian
   schedule:
     cron: 0 * * * *
-  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  entrypoint: flows/crawler_flows.py:pf_flow_crawl_site_by_name
   parameters:
     site_name: theguardian
     config:
@@ -64,9 +59,6 @@ deployments:
       use_render: false
   work_pool:
     name: pool-spider-rss
-    job_variables:
-      env:
-        PYTHONPATH: '{{ clone-repo.repository }}/backend'
 - name: crawl-npr
   version: null
   tags:
@@ -75,7 +67,7 @@ deployments:
   description: Crawl deployment for npr
   schedule:
     cron: 0 * * * *
-  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  entrypoint: flows/crawler_flows.py:pf_flow_crawl_site_by_name
   parameters:
     site_name: npr
     config:
@@ -95,7 +87,7 @@ deployments:
     name: pool-spider-rss
     job_variables:
       env:
-        PYTHONPATH: '{{ clone-repo.repository }}/backend'
+        PYTHONPATH: '{{ clone-repo.repository }}'
 - name: crawl-cnbc
   version: null
   tags:
@@ -104,7 +96,7 @@ deployments:
   description: Crawl deployment for cnbc
   schedule:
     cron: 0 * * * *
-  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  entrypoint: flows/crawler_flows.py:pf_flow_crawl_site_by_name
   parameters:
     site_name: cnbc
     config:
@@ -124,7 +116,7 @@ deployments:
     name: pool-spider-rss
     job_variables:
       env:
-        PYTHONPATH: '{{ clone-repo.repository }}/backend'
+        PYTHONPATH: '{{ clone-repo.repository }}'
 - name: crawl-wsj_cn
   version: null
   tags:
@@ -133,7 +125,7 @@ deployments:
   description: Crawl deployment for wsj_cn
   schedule:
     cron: 0 * * * *
-  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  entrypoint: flows/crawler_flows.py:pf_flow_crawl_site_by_name
   parameters:
     site_name: wsj_cn
     config:
@@ -153,7 +145,7 @@ deployments:
     name: pool-spider-rss
     job_variables:
       env:
-        PYTHONPATH: '{{ clone-repo.repository }}/backend'
+        PYTHONPATH: '{{ clone-repo.repository }}'
 - name: crawl-yahoo_finance_news
   version: null
   tags:
@@ -162,7 +154,7 @@ deployments:
   description: Crawl deployment for yahoo_finance_news
   schedule:
     cron: 0 * * * *
-  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  entrypoint: flows/crawler_flows.py:pf_flow_crawl_site_by_name
   parameters:
     site_name: yahoo_finance_news
     config:
@@ -182,7 +174,7 @@ deployments:
     name: pool-spider-rss
     job_variables:
       env:
-        PYTHONPATH: '{{ clone-repo.repository }}/backend'
+        PYTHONPATH: '{{ clone-repo.repository }}'
 - name: crawl-yahoo_finance_top
   version: null
   tags:
@@ -191,7 +183,7 @@ deployments:
   description: Crawl deployment for yahoo_finance_top
   schedule:
     cron: 0 * * * *
-  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  entrypoint: flows/crawler_flows.py:pf_flow_crawl_site_by_name
   parameters:
     site_name: yahoo_finance_top
     config:
@@ -211,7 +203,7 @@ deployments:
     name: pool-spider-rss
     job_variables:
       env:
-        PYTHONPATH: '{{ clone-repo.repository }}/backend'
+        PYTHONPATH: '{{ clone-repo.repository }}'
 - name: crawl-yahoo_news_finance
   version: null
   tags:
@@ -220,7 +212,7 @@ deployments:
   description: Crawl deployment for yahoo_news_finance
   schedule:
     cron: 0 * * * *
-  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  entrypoint: flows/crawler_flows.py:pf_flow_crawl_site_by_name
   parameters:
     site_name: yahoo_news_finance
     config:
@@ -240,7 +232,7 @@ deployments:
     name: pool-spider-rss
     job_variables:
       env:
-        PYTHONPATH: '{{ clone-repo.repository }}/backend'
+        PYTHONPATH: '{{ clone-repo.repository }}'
 - name: crawl-financial_times
   version: null
   tags:
@@ -249,7 +241,7 @@ deployments:
   description: Crawl deployment for financial_times
   schedule:
     cron: 0 * * * *
-  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  entrypoint: flows/crawler_flows.py:pf_flow_crawl_site_by_name
   parameters:
     site_name: financial_times
     config:
@@ -269,7 +261,7 @@ deployments:
     name: pool-spider-rss
     job_variables:
       env:
-        PYTHONPATH: '{{ clone-repo.repository }}/backend'
+        PYTHONPATH: '{{ clone-repo.repository }}'
 - name: crawl-dowjones
   version: null
   tags:
@@ -278,7 +270,7 @@ deployments:
   description: Crawl deployment for dowjones
   schedule:
     cron: 0 * * * *
-  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  entrypoint: flows/crawler_flows.py:pf_flow_crawl_site_by_name
   parameters:
     site_name: dowjones
     config:
@@ -298,7 +290,7 @@ deployments:
     name: pool-spider-rss
     job_variables:
       env:
-        PYTHONPATH: '{{ clone-repo.repository }}/backend'
+        PYTHONPATH: '{{ clone-repo.repository }}'
 - name: crawl-thomsonreuters
   version: null
   tags:
@@ -307,7 +299,7 @@ deployments:
   description: Crawl deployment for thomsonreuters
   schedule:
     cron: 0 0 * * *
-  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  entrypoint: flows/crawler_flows.py:pf_flow_crawl_site_by_name
   parameters:
     site_name: thomsonreuters
     config:
@@ -327,7 +319,7 @@ deployments:
     name: pool-spider-rss
     job_variables:
       env:
-        PYTHONPATH: '{{ clone-repo.repository }}/backend'
+        PYTHONPATH: '{{ clone-repo.repository }}'
 - name: crawl-xueqiu
   version: null
   tags:
@@ -336,7 +328,7 @@ deployments:
   description: Crawl deployment for xueqiu
   schedule:
     cron: 0 * * * *
-  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  entrypoint: flows/crawler_flows.py:pf_flow_crawl_site_by_name
   parameters:
     site_name: xueqiu
     config:
@@ -356,7 +348,7 @@ deployments:
     name: pool-spider-rss
     job_variables:
       env:
-        PYTHONPATH: '{{ clone-repo.repository }}/backend'
+        PYTHONPATH: '{{ clone-repo.repository }}'
 - name: crawl-hackernews
   version: null
   tags:
@@ -365,7 +357,7 @@ deployments:
   description: Crawl deployment for hackernews
   schedule:
     cron: '*/5 * * * *'
-  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  entrypoint: flows/crawler_flows.py:pf_flow_crawl_site_by_name
   parameters:
     site_name: hackernews
     config:
@@ -385,7 +377,7 @@ deployments:
     name: pool-spider-rss
     job_variables:
       env:
-        PYTHONPATH: '{{ clone-repo.repository }}/backend'
+        PYTHONPATH: '{{ clone-repo.repository }}'
 - name: crawl-techcrunch
   version: null
   tags:
@@ -394,7 +386,7 @@ deployments:
   description: Crawl deployment for techcrunch
   schedule:
     cron: 0 */6 * * *
-  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  entrypoint: flows/crawler_flows.py:pf_flow_crawl_site_by_name
   parameters:
     site_name: techcrunch
     config:
@@ -414,7 +406,7 @@ deployments:
     name: pool-spider-rss
     job_variables:
       env:
-        PYTHONPATH: '{{ clone-repo.repository }}/backend'
+        PYTHONPATH: '{{ clone-repo.repository }}'
 - name: crawl-36kr
   version: null
   tags:
@@ -423,7 +415,7 @@ deployments:
   description: Crawl deployment for 36kr
   schedule:
     cron: 0 */2 * * *
-  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  entrypoint: flows/crawler_flows.py:pf_flow_crawl_site_by_name
   parameters:
     site_name: 36kr
     config:
@@ -443,7 +435,7 @@ deployments:
     name: pool-spider-rss
     job_variables:
       env:
-        PYTHONPATH: '{{ clone-repo.repository }}/backend'
+        PYTHONPATH: '{{ clone-repo.repository }}'
 - name: crawl-huxiu
   version: null
   tags:
@@ -452,7 +444,7 @@ deployments:
   description: Crawl deployment for huxiu
   schedule:
     cron: 0 * * * *
-  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  entrypoint: flows/crawler_flows.py:pf_flow_crawl_site_by_name
   parameters:
     site_name: huxiu
     config:
@@ -472,4 +464,4 @@ deployments:
     name: pool-spider-rss
     job_variables:
       env:
-        PYTHONPATH: '{{ clone-repo.repository }}/backend'
+        PYTHONPATH: '{{ clone-repo.repository }}'
