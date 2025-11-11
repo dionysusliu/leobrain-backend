@@ -1,10 +1,15 @@
 # crawlers/core/crawler_service.py (新建)
 """爬虫服务层"""
 import logging
+import os
 from typing import Dict
 
 from crawlers.core.engine import CrawlerEngine
 from crawlers.core.spiders.rss_spider import RSSSpider
+
+# 初始化日志配置（确保在容器环境中正确输出）
+from common.logging_config import setup_logging
+setup_logging(level=os.getenv("LOG_LEVEL", "INFO"))
 
 logger = logging.getLogger(__name__)
 

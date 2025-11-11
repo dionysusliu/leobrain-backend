@@ -3,6 +3,7 @@ import uuid
 from abc import ABC, abstractmethod
 from typing import List, Optional
 import logging
+import os
 from sqlmodel import Session, select
 from datetime import datetime, timezone
 
@@ -10,6 +11,10 @@ from crawlers.core.types import Item
 from common.models import Content
 from common.database import get_session
 from common.storage import get_storage_service
+
+# 初始化日志配置（确保日志能正确输出）
+from common.logging_config import setup_logging
+setup_logging(level=os.getenv("LOG_LEVEL", "INFO"))
 
 logger = logging.getLogger(__name__)
 
