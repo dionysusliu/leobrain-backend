@@ -6,7 +6,7 @@ from selectolax.parser import HTMLParser
 import logging
 
 from crawlers.core.base_spider import ISpider
-from crawlers.core.types import Request, Response, Item
+from crawlers.core.types import Request, Response, Item, RequestMethod
 from crawlers.core.parser import Parser
 
 logger = logging.getLogger(__name__)
@@ -43,7 +43,7 @@ class RSSSpider(ISpider):
         """Generate initial request for RSS feed"""
         return [Request(
             url=self.feed_url,
-            method="GET",
+            method=RequestMethod.GET,
             metadata={"source": self.source_name, "is_feed": True}
         )]
     
@@ -113,7 +113,7 @@ class RSSSpider(ISpider):
                     if self.fetch_full_content and url and len(body) < 500:
                         new_requests.append(Request(
                             url=url,
-                            method="GET",
+                            method=RequestMethod.GET,
                             metadata={
                                 "source": self.source_name,
                                 "fetch_full": True,

@@ -51,7 +51,8 @@ scrape_configs:
           logger:
           service:
           container:
-          flow_run_name:  # 只使用 flow_run_name 作为 label
+          flow_run_name:  
+          task_run_name:
       # 移除不需要的 labels
       - labeldrop:
           - service_name
