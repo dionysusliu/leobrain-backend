@@ -11,6 +11,11 @@ from crawlers.core.types import Item
 from common.models import Content
 from common.database import get_session
 from common.storage import get_storage_service
+from common.logging_helpers import (
+    log_item_stored,
+    log_item_exists,
+    log_item_error
+)
 
 # 初始化日志配置（确保日志能正确输出）
 from common.logging_config import setup_logging
@@ -59,7 +64,7 @@ class StoragePipeline(IPipeline):
                 existing = session.exec(statement).first()
 
                 if existing:
-                    logger.debug(f"Content already exist: {item.url}")
+                    log_item_exists(logger, item, existing.id)
                     return False
                 
                 # generate uuid for object
@@ -68,7 +73,7 @@ class StoragePipeline(IPipeline):
                 # Upload body to MinIO
                 body_bytes = item.body.encode('utf-8')
                 object_name = self.storage.upload_content(
-                    content_uuid=content_uuid, # be updated after DB insertion
+                    content_uuid=content_uuid,
                     content_body=body_bytes,
                     content_type="text/plain",
                     source=item.source
@@ -82,27 +87,27 @@ class StoragePipeline(IPipeline):
                     author=item.author,
                     published_at=item.published_at,
                     body_ref=object_name,
-                    content_uuid=content_uuid,  # Set the UUID
+                    content_uuid=content_uuid,
                     lang=item.metadata.get('lang', 'en')
                 )
                 session.add(content)
                 session.commit()
                 session.refresh(content)
 
-                logger.info(f"Stored item: {item.title[:50]}... (UUID: {content_uuid}, DB ID: {content.id})")
+                log_item_stored(logger, item, content_uuid, content.id, len(body_bytes))
                 return True
             
             except Exception as e:
                 # rollback on error
                 session.rollback()
-                logger.error(f"Error processing item {item.url}: {e}")
+                log_item_error(logger, item, e)
                 return False
 
             finally:
                 if should_close:
                     session.close()
         except Exception as e:
-            logger.error(f"Error processing item {item.url}: {e}")
+            log_item_error(logger, item, e)
             return False
 
     

@@ -12,7 +12,8 @@ common:
       rules_directory: /loki/rules
   replication_factor: 1
   ring:
-    instance_addr: 127.0.0.1
+    # 在容器环境中，使用 0.0.0.0 而不是 127.0.0.1
+    instance_addr: 0.0.0.0
     kvstore:
       store: inmemory
 
@@ -28,6 +29,12 @@ schema_config:
   
 limits_config:
   allow_structured_metadata: false
+  # 允许接收更旧的日志（默认是 1 小时）
+  # 设置为 24 小时，允许接收一天内的旧日志
+  reject_old_samples: true
+  reject_old_samples_max_age: 24h
+  # 或者完全禁用旧日志拒绝（不推荐，但可以用于调试）
+  # reject_old_samples: false
 
 ruler:
   alertmanager_url: http://localhost:9093

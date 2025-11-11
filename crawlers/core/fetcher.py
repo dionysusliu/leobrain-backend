@@ -140,18 +140,22 @@ class HttpxFetcher(IFetcher):
             except httpx.HTTPStatusError as e:
                 if e.response.status_code == 429: # 'too many requests'
                     wait_time = 2 ** attempt # 指数退避
-                    logger.warning(f"Rate limited, waiting {wait_time}s")
+                    from common.logging_helpers import log_http_rate_limit
+                    log_http_rate_limit(logger, req.url, e.response.status_code, attempt, wait_time)
                     await asyncio.sleep(wait_time)
                 elif e.response.status_code == 500: # 'internal server error' 
                     wait_time = 2 ** attempt # 指数退避
-                    logger.warning(f"Server error, waiting {wait_time}s")
+                    from common.logging_helpers import log_http_server_error
+                    log_http_server_error(logger, req.url, e.response.status_code, attempt, wait_time)
                     await asyncio.sleep(wait_time)
                 else:
-                    logger.error(f"HTTP error {e.response.status_code}: {e}")
+                    from common.logging_helpers import log_http_error
+                    log_http_error(logger, req.url, e.response.status_code, req.method.value, e)
                     return None
 
             except Exception as e:
-                logger.error(f"Request error: {e}")
+                from common.logging_helpers import log_request_error
+                log_request_error(logger, req.url, req.method.value, e, attempt)
                 if attempt < self.max_retries - 1:
                     wait_time = 2 ** attempt
                     await asyncio.sleep(wait_time)

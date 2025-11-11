@@ -11,6 +11,14 @@ from crawlers.core.pipelines import IPipeline, StoragePipeline
 from crawlers.core.renderer import IRenderer, NoopRenderer, PlaywrightRenderer
 from crawlers.core.anti_bot import AntiBotMiddleware
 from crawlers.core.types import Request, Item
+from common.logging_helpers import (
+    log_spider_start,
+    log_fetch_failed,
+    log_parse_success,
+    log_parse_error,
+    log_crawl_summary,
+    log_no_items_processed
+)
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +52,8 @@ class CrawlerEngine:
         Returns:
             Number of items successfully processed
         """
-        logger.info(f"Starting crawl for spider: {spider.name}")
+        site_name = config.get('source_name', 'unknown')
+        log_spider_start(logger, site_name, spider.name, config.get('feed_url'))
         
         # Configure anti-bot if specified
         if config.get('qps') or config.get('delay'):
@@ -56,6 +65,7 @@ class CrawlerEngine:
         # Get initial requests
         requests = spider.seeds()
         all_items = []
+        failed_requests = []
         
         # Process requests
         while requests:
@@ -72,22 +82,30 @@ class CrawlerEngine:
                 resp = await self.fetcher.fetch(req)
             
             if not resp:
-                logger.warning(f"Failed to fetch: {req.url}")
+                request_type = "feed" if req.metadata.get('is_feed') else "full_content"
+                log_fetch_failed(logger, site_name, req.url, request_type)
+                failed_requests.append(req.url)
                 continue
             
             # Parse based on request type
-            # Check if this is a full content fetch request
             is_full_content = req.metadata.get('fetch_full', False)
             
-            if is_full_content and hasattr(spider, 'parse_full_content'):
-                # Use parse_full_content for follow-up requests
-                items, new_requests = spider.parse_full_content(resp)
-            else:
-                # Use regular parse for RSS feed or initial requests
-                items, new_requests = spider.parse(resp)
-            
-            all_items.extend(items)
-            requests.extend(new_requests)
+            try:
+                if is_full_content and hasattr(spider, 'parse_full_content'):
+                    items, new_requests = spider.parse_full_content(resp)
+                else:
+                    items, new_requests = spider.parse(resp)
+                
+                all_items.extend(items)
+                requests.extend(new_requests)
+                
+                request_type = "feed" if req.metadata.get('is_feed') else "full_content"
+                log_parse_success(logger, site_name, req.url, len(items), request_type)
+                
+            except Exception as e:
+                request_type = "feed" if req.metadata.get('is_feed') else "full_content"
+                log_parse_error(logger, site_name, req.url, e, request_type)
+                failed_requests.append(req.url)
             
             # Apply anti-bot after request
             if self.anti_bot:
@@ -96,8 +114,11 @@ class CrawlerEngine:
         # Process items through pipeline
         if all_items:
             success_count = await self.pipeline.process_items(all_items)
-            logger.info(f"Crawled {success_count}/{len(all_items)} items successfully")
+            log_crawl_summary(logger, site_name, len(all_items), success_count, failed_requests)
             return success_count
+        
+        if failed_requests:
+            log_no_items_processed(logger, site_name, failed_requests)
         
         return 0
     
