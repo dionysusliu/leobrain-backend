@@ -1,0 +1,475 @@
+prefect-version: 3.0.0
+name: leobrain-crawlers
+pull:
+- prefect.deployments.steps.git_clone:
+    id: clone-repo
+    repository: https://github.com/dionysusliu/leobrain.git
+    branch: main
+    access_token: null
+- prefect.deployments.steps.set_working_directory:
+    directory: '{{ clone-repo.repository }}'
+deployments:
+- name: crawl-bbc
+  version: null
+  tags:
+  - crawler
+  - bbc
+  description: Crawl deployment for bbc
+  schedule:
+    cron: '*/10 * * * *'
+  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  parameters:
+    site_name: bbc
+    config:
+      spider: rss
+      source_name: bbc
+      feed_url: http://feeds.bbci.co.uk/news/rss.xml
+      cron: '*/10 * * * *'
+      work_pool: pool-spider-rss
+      qps: 1.0
+      concurrency: 2
+      max_items: 50
+      fetch_full_content: false
+      headers:
+        User-Agent: LeoBrain/1.0 (+https://github.com/leobrain)
+      use_render: false
+  work_pool:
+    name: pool-spider-rss
+    job_variables:
+      env:
+        PYTHONPATH: '{{ clone-repo.repository }}/backend'
+- name: crawl-theguardian
+  version: null
+  tags:
+  - crawler
+  - theguardian
+  description: Crawl deployment for theguardian
+  schedule:
+    cron: 0 * * * *
+  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  parameters:
+    site_name: theguardian
+    config:
+      spider: rss
+      source_name: theguardian
+      feed_url: https://www.theguardian.com/world/rss
+      cron: 0 * * * *
+      work_pool: pool-spider-rss
+      qps: 1.0
+      concurrency: 2
+      max_items: 50
+      fetch_full_content: false
+      headers:
+        User-Agent: LeoBrain/1.0
+      use_render: false
+  work_pool:
+    name: pool-spider-rss
+    job_variables:
+      env:
+        PYTHONPATH: '{{ clone-repo.repository }}/backend'
+- name: crawl-npr
+  version: null
+  tags:
+  - crawler
+  - npr
+  description: Crawl deployment for npr
+  schedule:
+    cron: 0 * * * *
+  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  parameters:
+    site_name: npr
+    config:
+      spider: rss
+      source_name: npr
+      feed_url: https://feeds.npr.org/1001/rss.xml
+      cron: 0 * * * *
+      work_pool: pool-spider-rss
+      qps: 1.0
+      concurrency: 2
+      max_items: 50
+      fetch_full_content: false
+      headers:
+        User-Agent: LeoBrain/1.0
+      use_render: false
+  work_pool:
+    name: pool-spider-rss
+    job_variables:
+      env:
+        PYTHONPATH: '{{ clone-repo.repository }}/backend'
+- name: crawl-cnbc
+  version: null
+  tags:
+  - crawler
+  - cnbc
+  description: Crawl deployment for cnbc
+  schedule:
+    cron: 0 * * * *
+  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  parameters:
+    site_name: cnbc
+    config:
+      spider: rss
+      source_name: cnbc
+      feed_url: https://www.cnbc.com/id/100003114/device/rss/rss.html
+      cron: 0 * * * *
+      work_pool: pool-spider-rss
+      qps: 1.0
+      concurrency: 2
+      max_items: 50
+      fetch_full_content: false
+      headers:
+        User-Agent: LeoBrain/1.0
+      use_render: false
+  work_pool:
+    name: pool-spider-rss
+    job_variables:
+      env:
+        PYTHONPATH: '{{ clone-repo.repository }}/backend'
+- name: crawl-wsj_cn
+  version: null
+  tags:
+  - crawler
+  - wsj_cn
+  description: Crawl deployment for wsj_cn
+  schedule:
+    cron: 0 * * * *
+  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  parameters:
+    site_name: wsj_cn
+    config:
+      spider: rss
+      source_name: wsj_cn
+      feed_url: https://cn.wsj.com/zh-hans/rss
+      cron: 0 * * * *
+      work_pool: pool-spider-rss
+      qps: 1.0
+      concurrency: 2
+      max_items: 50
+      fetch_full_content: false
+      headers:
+        User-Agent: LeoBrain/1.0
+      use_render: false
+  work_pool:
+    name: pool-spider-rss
+    job_variables:
+      env:
+        PYTHONPATH: '{{ clone-repo.repository }}/backend'
+- name: crawl-yahoo_finance_news
+  version: null
+  tags:
+  - crawler
+  - yahoo_finance_news
+  description: Crawl deployment for yahoo_finance_news
+  schedule:
+    cron: 0 * * * *
+  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  parameters:
+    site_name: yahoo_finance_news
+    config:
+      spider: rss
+      source_name: yahoo_finance_news
+      feed_url: https://finance.yahoo.com/news/rssindex
+      cron: 0 * * * *
+      work_pool: pool-spider-rss
+      qps: 1.0
+      concurrency: 2
+      max_items: 50
+      fetch_full_content: false
+      headers:
+        User-Agent: LeoBrain/1.0
+      use_render: false
+  work_pool:
+    name: pool-spider-rss
+    job_variables:
+      env:
+        PYTHONPATH: '{{ clone-repo.repository }}/backend'
+- name: crawl-yahoo_finance_top
+  version: null
+  tags:
+  - crawler
+  - yahoo_finance_top
+  description: Crawl deployment for yahoo_finance_top
+  schedule:
+    cron: 0 * * * *
+  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  parameters:
+    site_name: yahoo_finance_top
+    config:
+      spider: rss
+      source_name: yahoo_finance_top
+      feed_url: https://finance.yahoo.com/rss/topstories
+      cron: 0 * * * *
+      work_pool: pool-spider-rss
+      qps: 1.0
+      concurrency: 2
+      max_items: 50
+      fetch_full_content: false
+      headers:
+        User-Agent: LeoBrain/1.0
+      use_render: false
+  work_pool:
+    name: pool-spider-rss
+    job_variables:
+      env:
+        PYTHONPATH: '{{ clone-repo.repository }}/backend'
+- name: crawl-yahoo_news_finance
+  version: null
+  tags:
+  - crawler
+  - yahoo_news_finance
+  description: Crawl deployment for yahoo_news_finance
+  schedule:
+    cron: 0 * * * *
+  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  parameters:
+    site_name: yahoo_news_finance
+    config:
+      spider: rss
+      source_name: yahoo_news_finance
+      feed_url: https://news.yahoo.com/rss/finance
+      cron: 0 * * * *
+      work_pool: pool-spider-rss
+      qps: 1.0
+      concurrency: 2
+      max_items: 50
+      fetch_full_content: false
+      headers:
+        User-Agent: LeoBrain/1.0
+      use_render: false
+  work_pool:
+    name: pool-spider-rss
+    job_variables:
+      env:
+        PYTHONPATH: '{{ clone-repo.repository }}/backend'
+- name: crawl-financial_times
+  version: null
+  tags:
+  - crawler
+  - financial_times
+  description: Crawl deployment for financial_times
+  schedule:
+    cron: 0 * * * *
+  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  parameters:
+    site_name: financial_times
+    config:
+      spider: rss
+      source_name: financial_times
+      feed_url: https://www.ft.com/rss/home/uk
+      cron: 0 * * * *
+      work_pool: pool-spider-rss
+      qps: 0.5
+      concurrency: 1
+      max_items: 50
+      fetch_full_content: false
+      headers:
+        User-Agent: LeoBrain/1.0
+      use_render: false
+  work_pool:
+    name: pool-spider-rss
+    job_variables:
+      env:
+        PYTHONPATH: '{{ clone-repo.repository }}/backend'
+- name: crawl-dowjones
+  version: null
+  tags:
+  - crawler
+  - dowjones
+  description: Crawl deployment for dowjones
+  schedule:
+    cron: 0 * * * *
+  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  parameters:
+    site_name: dowjones
+    config:
+      spider: rss
+      source_name: dowjones
+      feed_url: https://feeds.content.dowjones.io/public/rss/mw_topstories
+      cron: 0 * * * *
+      work_pool: pool-spider-rss
+      qps: 1.0
+      concurrency: 2
+      max_items: 50
+      fetch_full_content: false
+      headers:
+        User-Agent: LeoBrain/1.0
+      use_render: false
+  work_pool:
+    name: pool-spider-rss
+    job_variables:
+      env:
+        PYTHONPATH: '{{ clone-repo.repository }}/backend'
+- name: crawl-thomsonreuters
+  version: null
+  tags:
+  - crawler
+  - thomsonreuters
+  description: Crawl deployment for thomsonreuters
+  schedule:
+    cron: 0 0 * * *
+  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  parameters:
+    site_name: thomsonreuters
+    config:
+      spider: rss
+      source_name: thomsonreuters
+      feed_url: https://ir.thomsonreuters.com/rss/news-releases.xml?items=15
+      cron: 0 0 * * *
+      work_pool: pool-spider-rss
+      qps: 0.5
+      concurrency: 1
+      max_items: 50
+      fetch_full_content: false
+      headers:
+        User-Agent: LeoBrain/1.0
+      use_render: false
+  work_pool:
+    name: pool-spider-rss
+    job_variables:
+      env:
+        PYTHONPATH: '{{ clone-repo.repository }}/backend'
+- name: crawl-xueqiu
+  version: null
+  tags:
+  - crawler
+  - xueqiu
+  description: Crawl deployment for xueqiu
+  schedule:
+    cron: 0 * * * *
+  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  parameters:
+    site_name: xueqiu
+    config:
+      spider: rss
+      source_name: xueqiu
+      feed_url: https://xueqiu.com/hots/topic/rss
+      cron: 0 * * * *
+      work_pool: pool-spider-rss
+      qps: 1.0
+      concurrency: 2
+      max_items: 50
+      fetch_full_content: false
+      headers:
+        User-Agent: LeoBrain/1.0
+      use_render: false
+  work_pool:
+    name: pool-spider-rss
+    job_variables:
+      env:
+        PYTHONPATH: '{{ clone-repo.repository }}/backend'
+- name: crawl-hackernews
+  version: null
+  tags:
+  - crawler
+  - hackernews
+  description: Crawl deployment for hackernews
+  schedule:
+    cron: '*/5 * * * *'
+  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  parameters:
+    site_name: hackernews
+    config:
+      spider: rss
+      source_name: hackernews
+      feed_url: https://hnrss.org/frontpage
+      cron: '*/5 * * * *'
+      work_pool: pool-spider-rss
+      qps: 2.0
+      concurrency: 4
+      max_items: 30
+      fetch_full_content: false
+      headers:
+        User-Agent: LeoBrain/1.0
+      use_render: false
+  work_pool:
+    name: pool-spider-rss
+    job_variables:
+      env:
+        PYTHONPATH: '{{ clone-repo.repository }}/backend'
+- name: crawl-techcrunch
+  version: null
+  tags:
+  - crawler
+  - techcrunch
+  description: Crawl deployment for techcrunch
+  schedule:
+    cron: 0 */6 * * *
+  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  parameters:
+    site_name: techcrunch
+    config:
+      spider: rss
+      source_name: techcrunch
+      feed_url: https://techcrunch.com/feed/
+      cron: 0 */6 * * *
+      work_pool: pool-spider-rss
+      qps: 1.0
+      concurrency: 2
+      max_items: 50
+      fetch_full_content: true
+      headers:
+        User-Agent: LeoBrain/1.0
+      use_render: false
+  work_pool:
+    name: pool-spider-rss
+    job_variables:
+      env:
+        PYTHONPATH: '{{ clone-repo.repository }}/backend'
+- name: crawl-36kr
+  version: null
+  tags:
+  - crawler
+  - 36kr
+  description: Crawl deployment for 36kr
+  schedule:
+    cron: 0 */2 * * *
+  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  parameters:
+    site_name: 36kr
+    config:
+      spider: rss
+      source_name: 36kr
+      feed_url: https://www.36kr.com/feed
+      cron: 0 */2 * * *
+      work_pool: pool-spider-rss
+      qps: 1.0
+      concurrency: 2
+      max_items: 50
+      fetch_full_content: false
+      headers:
+        User-Agent: LeoBrain/1.0
+      use_render: false
+  work_pool:
+    name: pool-spider-rss
+    job_variables:
+      env:
+        PYTHONPATH: '{{ clone-repo.repository }}/backend'
+- name: crawl-huxiu
+  version: null
+  tags:
+  - crawler
+  - huxiu
+  description: Crawl deployment for huxiu
+  schedule:
+    cron: 0 * * * *
+  entrypoint: backend/flows/crawler_flows.py:pf_flow_crawl_site_by_name
+  parameters:
+    site_name: huxiu
+    config:
+      spider: rss
+      source_name: huxiu
+      feed_url: https://www.huxiu.com/rss/0.xml
+      cron: 0 * * * *
+      work_pool: pool-spider-rss
+      qps: 1.0
+      concurrency: 2
+      max_items: 50
+      fetch_full_content: false
+      headers:
+        User-Agent: LeoBrain/1.0
+      use_render: false
+  work_pool:
+    name: pool-spider-rss
+    job_variables:
+      env:
+        PYTHONPATH: '{{ clone-repo.repository }}/backend'
